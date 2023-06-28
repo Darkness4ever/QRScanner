@@ -19,7 +19,7 @@ const authenticateUser = ({ userName, password }) =>{
 //     },
 //   });
 
-    return axios.post("http://eventapp.azurewebsites.net//api/person/ValidateAndGetPerson/", 
+    return axios.post("https://eventapp.azurewebsites.net//api/person/ValidateAndGetPerson/", 
     {
         username : userName,
         oldPassword: password,

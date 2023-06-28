@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react'
-import {StyleSheet, Text, View, Button, TouchableOpacity, Alert, ActivityIndicator} from 'react-native'
+import React, {useState, useEffect, useRef} from 'react'
+import {StyleSheet, Text, View, Button, TouchableOpacity, Alert, ActivityIndicator, Platform} from 'react-native'
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { LinearGradient } from 'expo-linear-gradient';
 import $api from '../api'
@@ -22,19 +22,29 @@ const Home = ({route,navigation}) => {
     const [isResultVisible, setIsResultVisible] = useState(false)
     const [isError, setIsError] = useState(false)
     const [isLoading, setIsLoading] = useState(false);
+    const [cameraRef, setCameraRef] = useState(null)
+
+
+    const cameraReference = useRef(null)
 
     
 
     const askForCameraPermission = () => {
          (async () => {
-              const {status} = await BarCodeScanner.requestPermissionsAsync();
+          if(Platform.OS === 'web') {
+            setHasPermissions('true')
+          }else {
+            const {status} = await BarCodeScanner.requestPermissionsAsync();
               console.log(status == 'granted')
               setHasPermissions(status == 'granted')
+          }
+              
          })() 
     }
 
     // //Request Camera Permission
     useEffect(() =>  {
+        
         askForCameraPermission(); 
         console.log('PID2',route.params.personId)
         $api.getDetails(route.params.personId).then(resp => {
@@ -171,7 +181,11 @@ const Home = ({route,navigation}) => {
                       {/* <BarCodeScanner onBarCodeScanned = {scanned ? undefined : handleBarCodeScanned} style = {{height : 400, width : 400}} /> */}
                         <Camera 
                           style={StyleSheet.absoluteFillObject}
+                          ref={(ref) => {
+                            setCameraRef(ref)
+                          }}
                           onBarCodeScanned = {handleBarCodeScanned}
+                          zoom = {0.2}
                           barCodeScannerSettings={{
                             barCodeTypes : [BarCodeScanner.Constants.BarCodeType.qr]
                           }} 
